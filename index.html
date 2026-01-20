@@ -85,20 +85,17 @@
             widget = new TradingView.widget({
                 "width": "100%",
                 "height": "100%",
-                "symbol": "BITSTAMP:BTCUSDT",
+                "symbol": "BINANCE:BTCUSDT",
                 "interval": "30",
                 "timezone": "Asia/Kolkata",
                 "theme": "dark",
+                "container_id": "tradingview_chart",
                 "style": "1",
                 "locale": "en",
                 "toolbar_bg": "#000000",
-                "enable_publishing": false,
+                "enable_publishing": true,
                 "allow_symbol_change": true,
-                "container_id": "tradingview_chart",
                 "hide_side_toolbar": false,
-                "studies": [
-                    "MASimple@tv-basicstudies"
-                ],
                 "backgroundColor": "#000000",
                 "gridColor": "rgba(255, 255, 255, 0.06)",
                 "hide_top_toolbar": false,
@@ -110,7 +107,6 @@
                 "show_popup_button": true,
                 "popup_width": "1000",
                 "popup_height": "650",
-                "support_host": "https://www.tradingview.com"
             });
         }
         
@@ -119,22 +115,6 @@
             initChart();
         });
         
-        // Handle window resize
-        let resizeTimer;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                if (widget) {
-                    initChart();
-                }
-            }, 250);
-        });
-        
-        // Prevent overflow issues
-        document.addEventListener('DOMContentLoaded', function() {
-            document.body.style.overflow = 'auto';
-            document.documentElement.style.overflow = 'auto';
-        });
     </script>
 </body>
 </html>
