@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Chart</title>
+    <title>Live Trading Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes fadeInUp {
@@ -41,33 +41,62 @@
         .header-text {
             animation: fadeInUp 0.6s ease-out;
         }
+        
+        .price-glow {
+            text-shadow: 0 0 15px rgba(74, 222, 128, 0.5);
+        }
     </style>
 </head>
-<body class="bg-black min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-black min-h-screen p-4 md:p-6">
     
     <!-- Header -->
-    <div class="header-text w-full max-w-7xl mb-6 text-center">
-        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
-            Live Chart
+    <div class="header-text w-full max-w-7xl mx-auto mb-8">
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 text-center">
+            Live Trading Dashboard
         </h1>
-        <p class="text-gray-400 text-sm md:text-base">Real-time trading</p>
+        <p class="text-gray-400 text-sm md:text-base text-center">Real-time BTC/USDT trading data & analytics</p>
     </div>
     
-    <!-- Chart Container -->
-    <div class="chart-container w-full max-w-7xl">
-        <div class="bg-zinc-900 rounded-xl glow-effect overflow-hidden border border-zinc-800">
-            <!-- TradingView Widget -->
-            <div id="tradingview-widget" class="w-full" style="height: 600px;">
-                <div class="tradingview-widget-container" style="height: 100%; width: 100%;">
-                    <div id="tradingview_chart" style="height: 100%; width: 100%;"></div>
+    <!-- Main Content Grid -->
+    <div class="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        
+        <!-- Live Price Card (Left Column) -->
+        <div class="lg:col-span-1">
+            <div class="bg-zinc-900 rounded-xl border border-zinc-800 p-6 h-full glow-effect">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold text-white mb-2">BTC/USDT Live Price</h2>
+                    <p class="text-gray-400 text-sm mb-6">Powered by Binance WebSocket</p>
+                    
+                    <div id="price" class="text-5xl md:text-6xl font-extrabold text-green-400 animate-pulse price-glow mb-4">
+                        Loading...
+                    </div>
+                    
+                    <div id="time" class="text-gray-500 text-sm mb-6"></div>
+                    
+                    <div class="flex justify-center gap-3">
+                        <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-sm">REAL-TIME</span>
+                        <span class="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-sm">BINANCE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chart Container (Right 2/3) -->
+        <div class="lg:col-span-2 chart-container">
+            <div class="bg-zinc-900 rounded-xl glow-effect overflow-hidden border border-zinc-800 h-full">
+                <!-- TradingView Widget -->
+                <div id="tradingview-widget" class="w-full" style="height: 500px;">
+                    <div class="tradingview-widget-container" style="height: 100%; width: 100%;">
+                        <div id="tradingview_chart" style="height: 100%; width: 100%;"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Footer Info -->
-    <div class="mt-6 text-center text-gray-500 text-xs md:text-sm">
-        <p>Powered by TradingView • Live Market Data</p>
+    <!-- Footer -->
+    <div class="w-full max-w-7xl mx-auto text-center text-gray-500 text-xs md:text-sm border-t border-zinc-800 pt-6">
+        <p>This is for the Testing of API's and Websocket's • Live Market Data</p>
     </div>
 
     <!-- TradingView Widget Script -->
@@ -115,6 +144,22 @@
             initChart();
         });
         
+        // Live Price WebSocket
+        const priceEl = document.getElementById("price");
+        const timeEl = document.getElementById("time");
+        
+        const socket = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@trade");
+        
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const price = parseFloat(data.p).toLocaleString();
+            priceEl.textContent = `$${price}`;
+            priceEl.classList.remove('animate-pulse');
+            timeEl.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+        };
+        
+        socket.onopen = () => console.log("Connected to Binance");
+        socket.onerror = err => console.error("WebSocket error:", err);
     </script>
 </body>
 </html>
